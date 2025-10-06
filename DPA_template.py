@@ -29,8 +29,8 @@ traces = traces[:n_traces, :]
 ## Launch DPA and compute DoM, size of DoM 256 x 40000
 # Part 1
 
-for i in range(16): 
-    byte_to_attack = i  # Python uses 0-based indexing
+for j in range(16): 
+    byte_to_attack = j  # Python uses 0-based indexing
     key_guess = np.arange(256, dtype=np.uint8)  # 0 to 255
 
     input_plaintext = plain_text[:, byte_to_attack]
@@ -69,30 +69,43 @@ for i in range(16):
         mean0 = np.mean(traces[group0, :], axis=0)
         mean1 = np.mean(traces[group1, :], axis=0)
         DoM[col, :] = mean1-mean0
-        if maxDoM<abs(mean1-mean0):
-            maxDoM = abs(mean1-mean0)
+        if maxDoM<max(abs(mean1-mean0)):
+            maxDoM = max(abs(mean1-mean0))
             maxNum = col
         # TODO: Complete the DoM calculation
         pass
 
-    
+    # print(hex(maxNum))
+    bytes_recovered[j] = maxNum
 
-print("Bytes recovered (hex):")
+TRUE_KEY = np.array([0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF])
+correct = 0
+for i in range(16):
+    differences = (TRUE_KEY[i]^int(hex(bytes_recovered[i]), 16))
+    correct+=(8-bin(differences).count("1"))
+accuracy = (correct/128)*100
+print("Accuracy:",accuracy)
+
+print("Full recovered key (hex):")
 print(' '.join([f'{b:02x}' for b in bytes_recovered]))
 
 # Compare with the golden key (if known)
 print("\nNote: Complete the implementation to recover the key bytes")
 
-## Sample code for plots
-OFFSET = 192  # for N=64, use 0, 64, 128, 192
-N = 8  # for an NxN plot
+
+
+
+
+# Sample code for plots
+OFFSET = 240  # for N=64, use 0, 64, 128, 192
+N = 4  # for an NxN plot
 
 fig, axes = plt.subplots(N, N, figsize=(12, 12))
 fig.suptitle(f'DoM Plot (Offset: {OFFSET})')
 
 for i in range(N):
     for j in range(N):
-        key_candidate = (i * N + j + OFFSET) % 256
+        key_candidate = (i * N  + j + OFFSET) % 256
         if key_candidate < DoM.shape[0]:
             axes[i, j].plot(DoM[key_candidate, :])
             axes[i, j].set_title(f'Key: {key_candidate:02x}')
@@ -101,3 +114,7 @@ for i in range(N):
 plt.tight_layout()
 plt.savefig('dpa_analysis_incomplete.png', dpi=150, bbox_inches='tight')
 plt.show()
+
+
+
+
