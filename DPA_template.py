@@ -147,38 +147,36 @@ plt.savefig('Task1.png', dpi=150, bbox_inches='tight')
 plt.show()
 
 # Task 2P1
-# N = 2  # for an NxN plot
+N = 2  # for an NxN plot
 
-# fig, axes = plt.subplots(N, N, figsize=(12, 12))
-# fig.suptitle(f'DoM Plots for key byte 1 and 16 without absolute value(above) and with absolute value(below).')
+fig, axes = plt.subplots(N, N, figsize=(12, 12))
+fig.suptitle(f'DoM Plots for key byte 1 and 16 without absolute value(above) and with absolute value(below).')
 
-# key_candidate1 = bytes_recovered[0]
-# key_candidate16 = bytes_recovered[15]
+key_candidate1 = bytes_recovered[0]
+key_candidate16 = bytes_recovered[15]
 
-# if key_candidate1 < DoM.shape[0]:
-#     axes[0, 0].plot(DoM[key_candidate1, :])
-#     axes[0, 0].set_title(f'Key: {key_candidate1:02x}')
-#     axes[0, 0].set_xlim(0, DoM.shape[1])
-# if key_candidate16 < DoM.shape[0]:
-#     axes[0, 1].plot(DoM[key_candidate16, :])
-#     axes[0, 1].set_title(f'Key: {key_candidate16:02x}')
-#     axes[0, 1].set_xlim(0, DoM.shape[1])
+if key_candidate1 < DoM.shape[0]:
+    axes[0, 0].plot(DoM[key_candidate1, :])
+    axes[0, 0].set_title(f'Key: {key_candidate1:02x}')
+    axes[0, 0].set_xlim(0, DoM.shape[1])
+if key_candidate16 < DoM.shape[0]:
+    axes[0, 1].plot(DoM[key_candidate16, :])
+    axes[0, 1].set_title(f'Key: {key_candidate16:02x}')
+    axes[0, 1].set_xlim(0, DoM.shape[1])
 
-# if key_candidate1 < DoMAbs.shape[0]:
-#     axes[1, 0].plot(DoMAbs[key_candidate1, :])
-#     axes[1, 0].set_title(f'Key: {key_candidate1:02x}')
-#     axes[1, 0].set_xlim(0, DoMAbs.shape[1])
-# if key_candidate16 < DoMAbs.shape[0]:
-#     axes[1, 1].plot(DoMAbs[key_candidate16, :])
-#     axes[1, 1].set_title(f'Key: {key_candidate16:02x}')
-#     axes[1, 1].set_xlim(0, DoMAbs.shape[1])
+if key_candidate1 < DoMAbs.shape[0]:
+    axes[1, 0].plot(DoMAbs[key_candidate1, :])
+    axes[1, 0].set_title(f'Key: {key_candidate1:02x}')
+    axes[1, 0].set_xlim(0, DoMAbs.shape[1])
+if key_candidate16 < DoMAbs.shape[0]:
+    axes[1, 1].plot(DoMAbs[key_candidate16, :])
+    axes[1, 1].set_title(f'Key: {key_candidate16:02x}')
+    axes[1, 1].set_xlim(0, DoMAbs.shape[1])
 
 
-# plt.tight_layout()
-# plt.savefig('Task2.png', dpi=150, bbox_inches='tight')
-# plt.show()
-
-# Task 2P2
+plt.tight_layout()
+plt.savefig('Task2.png', dpi=150, bbox_inches='tight')
+plt.show()
 
 
 
