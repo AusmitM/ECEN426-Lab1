@@ -27,12 +27,17 @@ print(f"Traces shape: {traces.shape}")
 print(f"S-box shape: {sbox.shape}")
 
 bytes_recovered = np.zeros(16, dtype=np.uint8)
-n_traces = 20
+n_traces = 200
 
 traces = traces[:n_traces, :]
 
 ## Launch DPA and compute DoM, size of DoM 256 x 40000
 # Part 1
+key1DoM=None
+key1DoMAbs = None
+key16DoM = None
+key16DoMAbs = None
+
 
 for j in range(16): 
     byte_to_attack = j  # Python uses 0-based indexing
@@ -80,6 +85,12 @@ for j in range(16):
             maxDoM = max(abs(mean1-mean0))
             maxNum = col
         # TODO: Complete the DoM calculation
+        if j ==0:
+            key1DoM = DoM
+            key1DoMAbs = DoMAbs
+        if j == 15:
+            key16DoM = DoM
+            key16DoMAbs = DoMAbs
         pass
 
     # print(hex(maxNum))
@@ -155,23 +166,23 @@ fig.suptitle(f'DoM Plots for key byte 1 and 16 without absolute value(above) and
 key_candidate1 = bytes_recovered[0]
 key_candidate16 = bytes_recovered[15]
 
-if key_candidate1 < DoM.shape[0]:
-    axes[0, 0].plot(DoM[key_candidate1, :])
+if key_candidate1 < key1DoM.shape[0]:
+    axes[0, 0].plot(key1DoM[key_candidate1, :])
     axes[0, 0].set_title(f'Key: {key_candidate1:02x}')
-    axes[0, 0].set_xlim(0, DoM.shape[1])
-if key_candidate16 < DoM.shape[0]:
-    axes[0, 1].plot(DoM[key_candidate16, :])
+    axes[0, 0].set_xlim(0, key1DoM.shape[1])
+if key_candidate16 < key16DoM.shape[0]:
+    axes[0, 1].plot(key16DoM[key_candidate16, :])
     axes[0, 1].set_title(f'Key: {key_candidate16:02x}')
-    axes[0, 1].set_xlim(0, DoM.shape[1])
+    axes[0, 1].set_xlim(0, key16DoM.shape[1])
 
-if key_candidate1 < DoMAbs.shape[0]:
-    axes[1, 0].plot(DoMAbs[key_candidate1, :])
+if key_candidate1 < key1DoMAbs.shape[0]:
+    axes[1, 0].plot(key1DoMAbs[key_candidate1, :])
     axes[1, 0].set_title(f'Key: {key_candidate1:02x}')
-    axes[1, 0].set_xlim(0, DoMAbs.shape[1])
-if key_candidate16 < DoMAbs.shape[0]:
-    axes[1, 1].plot(DoMAbs[key_candidate16, :])
+    axes[1, 0].set_xlim(0, key1DoMAbs.shape[1])
+if key_candidate16 < key16DoMAbs.shape[0]:
+    axes[1, 1].plot(key16DoMAbs[key_candidate16, :])
     axes[1, 1].set_title(f'Key: {key_candidate16:02x}')
-    axes[1, 1].set_xlim(0, DoMAbs.shape[1])
+    axes[1, 1].set_xlim(0, key16DoMAbs.shape[1])
 
 
 plt.tight_layout()
