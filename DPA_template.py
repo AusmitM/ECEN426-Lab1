@@ -7,6 +7,7 @@ This is an incomplete version for students to complete.
 import numpy as np
 import scipy.io
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 # Load plaintext, ciphertext, traces, and sbox
 data = scipy.io.loadmat('aes_power_data.mat')
@@ -15,6 +16,10 @@ cipher_text = data['cipher_text']
 traces = data['traces']
 sbox = data['sbox'].flatten()  # Convert from (1,256) to (256,)
 
+print("Name: Ausmit Mondal\nUIN: 634002244\nNetID: tmsparklefox")
+print("Time:", datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
+
+
 print(f"Loaded data:")
 print(f"Plain text shape: {plain_text.shape}")
 print(f"Cipher text shape: {cipher_text.shape}")
@@ -22,7 +27,7 @@ print(f"Traces shape: {traces.shape}")
 print(f"S-box shape: {sbox.shape}")
 
 bytes_recovered = np.zeros(16, dtype=np.uint8)
-n_traces = 200
+n_traces = 20
 
 traces = traces[:n_traces, :]
 
@@ -38,8 +43,8 @@ for j in range(16):
     # TODO: Students need to complete this section
     # Hint: Create a matrix y where y[i,j] represents the S-box output
     # for trace i and key guess j
-    y = np.zeros((200, 256), dtype=np.uint8)
-    for i in range(200):
+    y = np.zeros((n_traces, 256), dtype=np.uint8)
+    for i in range(n_traces):
         # TODO: Fill in the S-box lookup
         # y[i,:] = sbox[???]
         y[i, :] = sbox[np.bitwise_xor(key_guess, input_plaintext[i])]
@@ -47,12 +52,13 @@ for j in range(16):
 
     # TODO: Students need to implement power consumption prediction
     # Hint: Extract the least significant bit from y
-    power_consumption = np.zeros((200, 256), dtype=np.uint8)
+    power_consumption = np.zeros((n_traces, 256), dtype=np.uint8)
     # power_consumption = ???
     power_consumption = np.bitwise_and(y, 1)
 
     # Part 2 - DPA attack
     DoM = np.zeros((256, traces.shape[1]))  # Difference of Means matrix
+    DoMAbs = np.zeros((256, traces.shape[1])) 
 
     maxDoM = 0
     maxNum = 0
@@ -69,6 +75,7 @@ for j in range(16):
         mean0 = np.mean(traces[group0, :], axis=0)
         mean1 = np.mean(traces[group1, :], axis=0)
         DoM[col, :] = mean1-mean0
+        DoMAbs[col, :] = abs(mean1-mean0)
         if maxDoM<max(abs(mean1-mean0)):
             maxDoM = max(abs(mean1-mean0))
             maxNum = col
@@ -84,9 +91,9 @@ for i in range(16):
     differences = (TRUE_KEY[i]^int(hex(bytes_recovered[i]), 16))
     correct+=(8-bin(differences).count("1"))
 accuracy = (correct/128)*100
-print("Accuracy:",accuracy)
+print("\nAccuracy:",accuracy)
 
-print("Full recovered key (hex):")
+print("\nFull recovered key (hex):")
 print(' '.join([f'{b:02x}' for b in bytes_recovered]))
 
 # Compare with the golden key (if known)
@@ -96,9 +103,9 @@ print("\nNote: Complete the implementation to recover the key bytes")
 
 
 
-# Sample code for plots
-OFFSET = 240  # for N=64, use 0, 64, 128, 192
-N = 4  # for an NxN plot
+# For task 1
+OFFSET = 231  # for N=64, use 0, 64, 128, 192
+N = 5  # for an NxN plot
 
 fig, axes = plt.subplots(N, N, figsize=(12, 12))
 fig.suptitle(f'DoM Plot (Offset: {OFFSET})')
@@ -111,10 +118,67 @@ for i in range(N):
             axes[i, j].set_title(f'Key: {key_candidate:02x}')
             axes[i, j].set_xlim(0, DoM.shape[1])
 
+for spine in axes[4,4].spines.values():
+    spine.set_edgecolor('green')
+    spine.set_linewidth(3)
+
+for spine in axes[3,4].spines.values():
+    spine.set_edgecolor('red')
+    spine.set_linewidth(3)
+
+for spine in axes[1,1].spines.values():
+    spine.set_edgecolor('red')
+    spine.set_linewidth(3)
+
+for spine in axes[1,3].spines.values():
+    spine.set_edgecolor('red')
+    spine.set_linewidth(3)
+    
+for spine in axes[0, 1].spines.values():
+    spine.set_edgecolor('red')
+    spine.set_linewidth(3)
+
+for spine in axes[4, 3].spines.values():
+    spine.set_edgecolor('red')
+    spine.set_linewidth(3)
+
 plt.tight_layout()
-plt.savefig('dpa_analysis_incomplete.png', dpi=150, bbox_inches='tight')
+plt.savefig('Task1.png', dpi=150, bbox_inches='tight')
 plt.show()
 
+# Task 2P1
+# N = 2  # for an NxN plot
+
+# fig, axes = plt.subplots(N, N, figsize=(12, 12))
+# fig.suptitle(f'DoM Plots for key byte 1 and 16 without absolute value(above) and with absolute value(below).')
+
+# key_candidate1 = bytes_recovered[0]
+# key_candidate16 = bytes_recovered[15]
+
+# if key_candidate1 < DoM.shape[0]:
+#     axes[0, 0].plot(DoM[key_candidate1, :])
+#     axes[0, 0].set_title(f'Key: {key_candidate1:02x}')
+#     axes[0, 0].set_xlim(0, DoM.shape[1])
+# if key_candidate16 < DoM.shape[0]:
+#     axes[0, 1].plot(DoM[key_candidate16, :])
+#     axes[0, 1].set_title(f'Key: {key_candidate16:02x}')
+#     axes[0, 1].set_xlim(0, DoM.shape[1])
+
+# if key_candidate1 < DoMAbs.shape[0]:
+#     axes[1, 0].plot(DoMAbs[key_candidate1, :])
+#     axes[1, 0].set_title(f'Key: {key_candidate1:02x}')
+#     axes[1, 0].set_xlim(0, DoMAbs.shape[1])
+# if key_candidate16 < DoMAbs.shape[0]:
+#     axes[1, 1].plot(DoMAbs[key_candidate16, :])
+#     axes[1, 1].set_title(f'Key: {key_candidate16:02x}')
+#     axes[1, 1].set_xlim(0, DoMAbs.shape[1])
+
+
+# plt.tight_layout()
+# plt.savefig('Task2.png', dpi=150, bbox_inches='tight')
+# plt.show()
+
+# Task 2P2
 
 
 
