@@ -115,8 +115,8 @@ print("\nNote: Complete the implementation to recover the key bytes")
 
 
 # For task 1
-OFFSET = 231  # for N=64, use 0, 64, 128, 192
-N = 5  # for an NxN plot
+OFFSET = 240  # for N=64, use 0, 64, 128, 192
+N = 4  # for an NxN plot
 
 fig, axes = plt.subplots(N, N, figsize=(12, 12))
 fig.suptitle(f'DoM Plot (Offset: {OFFSET})')
@@ -129,29 +129,14 @@ for i in range(N):
             axes[i, j].set_title(f'Key: {key_candidate:02x}')
             axes[i, j].set_xlim(0, DoM.shape[1])
 
-for spine in axes[4,4].spines.values():
+for spine in axes[3,3].spines.values():
     spine.set_edgecolor('green')
     spine.set_linewidth(3)
 
-for spine in axes[3,4].spines.values():
+for spine in axes[2,2].spines.values():
     spine.set_edgecolor('red')
     spine.set_linewidth(3)
 
-for spine in axes[1,1].spines.values():
-    spine.set_edgecolor('red')
-    spine.set_linewidth(3)
-
-for spine in axes[1,3].spines.values():
-    spine.set_edgecolor('red')
-    spine.set_linewidth(3)
-    
-for spine in axes[0, 1].spines.values():
-    spine.set_edgecolor('red')
-    spine.set_linewidth(3)
-
-for spine in axes[4, 3].spines.values():
-    spine.set_edgecolor('red')
-    spine.set_linewidth(3)
 
 plt.tight_layout()
 plt.savefig('Task1.png', dpi=150, bbox_inches='tight')
